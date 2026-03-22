@@ -1,0 +1,33 @@
+
+services:
+  pipeline:
+    container_name: pipeline
+    image: pipeline:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ../generated_outputs:/workspace/generated_outputs
+      - huggingface-cache:/root/.cache/huggingface
+      - torch-cache:/root/.cache/torch
+    ports:
+      - "10006:10006"
+    runtime: nvidia
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - HF_HOME=/root/.cache/huggingface
+
+volumes:
+  huggingface-cache:
+    driver: local
+
+  torch-cache:
+    driver: local
